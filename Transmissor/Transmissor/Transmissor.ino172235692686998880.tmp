@@ -16,15 +16,13 @@ void setup() {
 }
  
 void loop(){
-  //cliente Identificação == 1000
-  int cliente = 1000;
-  int leitura = 3200;
-  
-  mySwitch.send(cliente, 24);
-  delay(3000);
+  //cliente ID == 1000
+  int leitura = 1000;
+   
   mySwitch.send(leitura, 24);
-  
+
   leitura = leitura + 20;
+  
   delay(6000);
 
 }

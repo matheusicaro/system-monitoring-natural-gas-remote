@@ -3,63 +3,84 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <RCSwitch.h>
+#include <SD.h>
+#include <SPI.h>
 
-// pin 7 - Serial clock out (SCLK)
-// pin 6 - Serial data out (DIN)
-// pin 5 - Data/Command select (D/C)
-// pin 4 - LCD chip select (CS/CE)
-// pin 3 - LCD reset (RST)
-
-Adafruit_PCD8544 display = Adafruit_PCD8544(7, 6, 5, 4, 3);
-
+//_____________________________RECEPTOR
 RCSwitch mySwitch = RCSwitch();
 int value = -1;
+//_____________________________FIM
+
+//_____________________________SD-CARD
+int CS_PIN = 53;
+File file;
+//_____________________________FIM
+
+String dado;
 
 void setup()   
 {
   Serial.begin(9600);
-  display.begin();
+  //display.begin();
 
- //seleciona o pino 0 que é na verdade o 2 no arduino, mas aqui tem que ser zero para ser o 2
+//_____________________________SD-card
+  if (!SD.begin(CS_PIN)) {
+      Serial.println("Inicialização FALHOU");
+     }
+//_____________________________FIM
+
+  
+  //seleciona o pino 0 que é na verdade o 2 no arduino, mas aqui tem que ser zero para ser o 2
   mySwitch.enableReceive(0);
 }
 
 void loop()
 {
- //---------------------------------------DISPLAY---------------------------------------
-      display.setContrast(60); //Ajusta o contraste do display
-      display.clearDisplay();   //Apaga o buffer e o display
-      display.setTextSize(1);  //Seta o tamanho do texto
-      display.setTextColor(BLACK); //Seta a cor do texto
-      display.setCursor(0,0);  //Seta a posição do cursor
-      display.setTextColor(BLACK, WHITE);//Texto invertido - Branco com fundo preto
- //---------------------------------------FIM-------------------------------------------
-
-
-      display.println("Start");//Escreve no display  
-      display.display();
+    
+      
+      Serial.println("START"); 
       delay(3000);
 
+//__________Transmissor__________________Recebe os dados
   if(mySwitch.available()){
 
       value = mySwitch.getReceivedValue();
-      String myString = String (value);
-      display.println("Recebido:");//Escreve no display
-      display.display();
-      display.println(myString);//Escreve no display  
-      display.display();
-      delay(3000);
-      display.println("encerrando...");//Escreve no display
-      display.display();
-      delay(1500);
- 
- } else{
+      dado = String (value);
+      Serial.print("Recebido: ");
+      Serial.println(dado); 
+      delay(1000); 
+    
+      Serial.println("Encerrando...");  
+      delay(1000); 
+  }
+  else{
      
-      display.println("NADA...");//Escreve no display  
-      display.display();
-      delay(3000);
+      Serial.println("NADA...");  
+      //display.display();
+      delay(2000);
  }
+//__________________________________________FIM
 
-   mySwitch.resetAvailable();
+
+//__________________________________________Armazenar no Banco
+
+ file = SD.open("BD.txt", FILE_WRITE);
+ if (file) {
+    Serial.print("gravando no DB...");
+    file.println(dado);
+    file.close();
+    
+    Serial.println("Sucesso!");
+    delay(1000);
+
+  } else {
+    Serial.println("ERROR_SD: Ao gravar");
+    delay(1000);
+  }
+
+//__________________________________________FIM
+
+
+  mySwitch.resetAvailable();
  
 }
