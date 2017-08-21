@@ -4,10 +4,9 @@ Projeto coletura de leitura remota.
 Codigos do projeto de automação industrial, TCC.
 
 @Transmissor {
-  Codigo para transmissão de dados utilizando o modulo de radio frequencia 433mhz.
+  Desenvolvimento de codigo para implementar em um microcontrolador arudino, que deverá transmitir dados para uma central.
 }
 
 @Receptor{
-  Codigo para recepção de dados utilizando o modulo de radio frequencia 433mhz. 
-  Ainda, contem codificação para impressao de dados e informações em display nokia 5110.
+  Desenvolvimento de codigo para implementar em um microcontrolador arduino, afim de receber dados de transmissores e realizar manipulações de dados.
 }
