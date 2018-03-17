@@ -17,10 +17,6 @@ String client = "";
 
   void setup()
   {
-    pinMode(7, OUTPUT);                         
-    digitalWrite(7, LOW);
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
     Serial.begin(9600);
    
     if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       

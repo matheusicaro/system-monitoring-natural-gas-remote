@@ -22,10 +22,10 @@ void setup() {
 
 void loop() {
   
-    delay(1000);
+    delay(3000);
     Serial.println(volume/2);   //divisão necessaria para relaçao da media
-    //sendCliente();
-    //sendLeitura();
+    sendCliente();
+    sendLeitura();
     
 }
 
@@ -43,7 +43,7 @@ void readingVolume(){
 void sendCliente() {
 
 /********* trecho de codigo para envio de dados transmissor -> recptor */
-                                                                              //delay(1000);
+                                                                                      //delete delay(1000);
     char tosend[client.length() + 1];
     client.toCharArray(tosend, sizeof(tosend));
     vw_send((uint8_t *)tosend, client.length() + 1);
@@ -61,8 +61,8 @@ void sendCliente() {
 void sendLeitura() {
     
     String leitura = "0";
-    leitura += String(volume);           //converte int em string
-                                                                              //delay(1000);
+    leitura += String(volume/2);           //converte int em string
+                                                                                      //delete delay(1000);
     
 /********* trecho de codigo para envio de dados transmissor -> recptor */
     char tosend[leitura.length() + 1]; 
