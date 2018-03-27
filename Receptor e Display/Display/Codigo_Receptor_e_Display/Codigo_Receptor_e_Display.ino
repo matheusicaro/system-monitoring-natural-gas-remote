@@ -32,9 +32,13 @@ void loop()
       display.display();
       display.println("ENNNNNNNND");//Escreve no display  
       display.display();
-      delay(2000);
 
-      //delay(3000);
+      delay(1000);
+      display.clearDisplay();   //Apaga o buffer e o display
+      
+      display.println("KAAAAAAAAAAAAAAA");//Escreve no display  
+      display.display();
 
- 
+      delay(1000);
+      display.clearDisplay();   //Apaga o buffer e o display
 }
