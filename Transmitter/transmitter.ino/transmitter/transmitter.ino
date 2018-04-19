@@ -17,7 +17,7 @@ void setup() {
   // Initialise the IO and ISR
   vw_set_ptt_inverted(true);      // Required for RF Link module
   vw_setup(2000);                 // Bits per sec
-  vw_set_tx_pin(10);              // pin 10 ARDUINO-UNO
+  vw_set_tx_pin(7);              // pin 7 ARDUINO-UNO
 }
 
 void loop() {
