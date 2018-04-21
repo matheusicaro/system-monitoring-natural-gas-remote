@@ -9,36 +9,34 @@
 
 Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);
 
+
+int volume = 0;
+
 void setup()   
 {
   Serial.begin(9600);
   display.begin();
 
-   //---------------------------------------DISPLAY---------------------------------------
-      display.setContrast(60); //Ajusta o contraste do display
+  //---------------------------------------DISPLAY---------------------------------------
+      display.setContrast(50); //Ajusta o contraste do display
       display.clearDisplay();   //Apaga o buffer e o display
       display.setTextSize(1);  //Seta o tamanho do texto
       display.setTextColor(BLACK); //Seta a cor do texto
       display.setCursor(0,0);  //Seta a posição do cursor
-      display.setTextColor(BLACK, WHITE);//Texto invertido - Branco com fundo preto
- //---------------------------------------FIM-------------------------------------------
+      display.println(" TRANSMISSOR ");  
 
+ //---------------------------------------FIM-------------------------------------------
 }
 
 void loop()
 {
+      display.setTextColor(WHITE, BLACK); 
 
-      display.println("Start");//Escreve no display  
-      display.display();
-      display.println("ENNNNNNNND");//Escreve no display  
-      display.display();
-
-      delay(1000);
-      display.clearDisplay();   //Apaga o buffer e o display
-      
-      display.println("KAAAAAAAAAAAAAAA");//Escreve no display  
+      display.setCursor(0,20);  //Seta a posição do cursor
+      display.print(" Volume: ");//Escreve no display  
+      display.println(volume);  
       display.display();
 
-      delay(1000);
-      display.clearDisplay();   //Apaga o buffer e o display
+      delay(2000);
+      volume++;
 }
