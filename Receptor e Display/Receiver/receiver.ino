@@ -1,3 +1,5 @@
+#include <LCD5110_Basic.h>
+
 #include <VirtualWire.h>    // you must download and install the VirtualWire.h to your hardware/libraries folder
 #include <SD.h>
 #include <SPI.h>
@@ -8,6 +10,21 @@
 #undef float
 #undef round
 
+//-----------------------------------CONFIG--DISPLAY------------------------------------
+  // pin 8 - Serial clock out (SCLK)
+  // pin 9 - Serial data out (DIN)
+  // pin 10 - Data/Command select (D/C)
+  // pin 11 - LCD chip select (CS/CE)
+  // pin 12 - LCD reset (RST)
+  
+  LCD5110 tela(8,9,10,12,11);
+  
+  extern uint8_t SmallFont[];
+  extern uint8_t MediumNumbers[];
+  extern uint8_t BigNumbers[];
+//---------------------------------------FIM-------------------------------------------
+
+
 int CS_PIN = 53;                                // pino do arduino CS = 53, CS é a entrada do cartão de memoria
 File file;                                      // variavel de armazenamento no cartão de memoria
 
@@ -17,18 +34,33 @@ String client = "";
 
   void setup()
   {
-    Serial.begin(9600);
-   
-    if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       
-          Serial.println("ERROR - Cartao de memoria FALHOU");   //
-          return;                                               //
-     }                                                          // end
-     
-    // Initialise the IO and ISR
-    vw_set_ptt_inverted(true);                    // Required for RX Link Module
-    vw_setup(2000);                               // Bits per sec
-    vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
-    vw_rx_start();                                // Start the receiver
+  Serial.begin(9600);
+       //---------------------------------------DISPLAY---------------------------------------
+            tela.InitLCD(60);
+
+            tela.setFont(SmallFont); //Definindo a fonte
+            tela.clrScr(); //Apaga o contéudo que estiver na tela
+      
+            tela.setContrast(60);
+            tela.print("RECEPTOR", CENTER, 0);
+       //---------------------------------------FIM-------------------------------------------
+
+
+       //---------------------------------------SD-CARD---------------------------------------
+            if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       
+                  Serial.println("ERROR - Cartao de memoria FALHOU");   //
+                  return;                                               //
+             }                                                          // end
+       //---------------------------------------FIM-------------------------------------------
+
+
+
+       //---------------------------------------RF-433--------------------------------------
+            vw_set_ptt_inverted(true);                    // Required for RX Link Module
+            vw_setup(2000);                               // Bits per sec
+            vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
+            vw_rx_start();                                // Start the receiver
+         //---------------------------------------FIM-------------------------------------------
   }
 
 
@@ -46,8 +78,12 @@ String client = "";
          for (int i = 0; i < buflen; i++) {           // coleta todo dado do buffer recebido
            client += ((char)buf[i]);                  //
          }                                            // end if
+         
+         tela.print("Cliente: ", LEFT, 20);
+         tela.print(client, RIGHT, 20);
          Serial.print("Cliente....: ");
          Serial.println(client);
+
          receberLeitura();                            // funcao receber leitura
          gravarBD();
       }
@@ -59,7 +95,7 @@ String client = "";
 
 
 /*----------------------------------------------------------------------------------------*/
-int receberLeitura(){                    // funcao para receber leitura do gas, enviada pelo transmissor 433MHz           
+void receberLeitura(){                    // funcao para receber leitura do gas, enviada pelo transmissor 433MHz           
 
   boolean recebido = false;
   leitura = "";
@@ -78,7 +114,10 @@ int receberLeitura(){                    // funcao para receber leitura do gas, 
       recebido = true;
   }                                                  // end while
 
-  return Serial.println(leitura);
+         tela.setFont(MediumNumbers);
+         tela.printNumI(leitura.toInt(), CENTER, 30);
+         Serial.print("Leitura...: ");
+         Serial.println(leitura);
 }
 /*----------------------------------------------------------------------------------------*/
 

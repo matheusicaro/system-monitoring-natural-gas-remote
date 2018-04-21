@@ -1,5 +1,5 @@
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
+#include <LCD5110_Basic.h>
+
 
 // pin 8 - Serial clock out (SCLK)
 // pin 9 - Serial data out (DIN)
@@ -7,36 +7,36 @@
 // pin 11 - LCD chip select (CS/CE)
 // pin 12 - LCD reset (RST)
 
-Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);
+LCD5110 tela(8,9,10,12,11);
 
+extern uint8_t SmallFont[];
+extern uint8_t MediumNumbers[];
+extern uint8_t BigNumbers[];
 
 int volume = 0;
 
 void setup()   
 {
-  Serial.begin(9600);
-  display.begin();
+  tela.InitLCD(50);
 
-  //---------------------------------------DISPLAY---------------------------------------
-      display.setContrast(50); //Ajusta o contraste do display
-      display.clearDisplay();   //Apaga o buffer e o display
-      display.setTextSize(1);  //Seta o tamanho do texto
-      display.setTextColor(BLACK); //Seta a cor do texto
-      display.setCursor(0,0);  //Seta a posição do cursor
-      display.println(" TRANSMISSOR ");  
+ //---------------------------------------DISPLAY---------------------------------------
+
+      tela.setFont(SmallFont); //Definindo a fonte
+      tela.clrScr(); //Apaga o contéudo que estiver na tela
+
+      tela.setContrast(60);
+      tela.print("TRANSMISSOR", CENTER, 0);
+      tela.print("Volume:", LEFT, 20);
 
  //---------------------------------------FIM-------------------------------------------
 }
 
 void loop()
 {
-      display.setTextColor(WHITE, BLACK); 
 
-      display.setCursor(0,20);  //Seta a posição do cursor
-      display.print(" Volume: ");//Escreve no display  
-      display.println(volume);  
-      display.display();
-
+      tela.setFont(MediumNumbers);
+      tela.printNumI(volume, CENTER, 30);
+      
       delay(2000);
       volume++;
 }
