@@ -1,5 +1,5 @@
-#include <LCD5110_Basic.h>
-
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
 #include <VirtualWire.h>    // you must download and install the VirtualWire.h to your hardware/libraries folder
 #include <SD.h>
 #include <SPI.h>
@@ -17,11 +17,7 @@
   // pin 11 - LCD chip select (CS/CE)
   // pin 12 - LCD reset (RST)
   
-  LCD5110 tela(8,9,10,12,11);
-  
-  extern uint8_t SmallFont[];
-  extern uint8_t MediumNumbers[];
-  extern uint8_t BigNumbers[];
+Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
 //---------------------------------------FIM-------------------------------------------
 
 
@@ -34,17 +30,10 @@ String client = "";
 
   void setup()
   {
-  Serial.begin(9600);
-       //---------------------------------------DISPLAY---------------------------------------
-            tela.InitLCD(60);
-
-            tela.setFont(SmallFont); //Definindo a fonte
-            tela.clrScr(); //Apaga o contéudo que estiver na tela
-      
-            tela.setContrast(60);
-            tela.print("RECEPTOR", CENTER, 0);
-       //---------------------------------------FIM-------------------------------------------
-
+       Serial.begin(9600);
+       startReceiver();
+       startDisplay();
+    
 
        //---------------------------------------SD-CARD---------------------------------------
             if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       
@@ -53,19 +42,9 @@ String client = "";
              }                                                          // end
        //---------------------------------------FIM-------------------------------------------
 
-
-
-       //---------------------------------------RF-433--------------------------------------
-            vw_set_ptt_inverted(true);                    // Required for RX Link Module
-            vw_setup(2000);                               // Bits per sec
-            vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
-            vw_rx_start();                                // Start the receiver
-         //---------------------------------------FIM-------------------------------------------
   }
 
 
-
-/*----------------------------------------------------------------------------------------*/
   void loop() {
     
     uint8_t buf[VW_MAX_MESSAGE_LEN];              // variaveis buf da biblioteca VM 433MHz
@@ -78,24 +57,70 @@ String client = "";
          for (int i = 0; i < buflen; i++) {           // coleta todo dado do buffer recebido
            client += ((char)buf[i]);                  //
          }                                            // end if
+
          
-         tela.print("Cliente: ", LEFT, 20);
-         tela.print(client, RIGHT, 20);
+         receiveData();                            
+         saveDataBase();
+         printDisplay();
          Serial.print("Cliente....: ");
          Serial.println(client);
-
-         receberLeitura();                            // funcao receber leitura
-         gravarBD();
+         Serial.print("Leitura...: ");
+         Serial.println(leitura);
       }
       Serial.println("");
     }                                             // end if
   }
-/*----------------------------------------------------------------------------------------*/
 
 
 
-/*----------------------------------------------------------------------------------------*/
-void receberLeitura(){                    // funcao para receber leitura do gas, enviada pelo transmissor 433MHz           
+
+/*_____ S E T U P()________________________________________ startReceiver() _____________________________________________*/
+    void startReceiver (){
+
+            vw_set_ptt_inverted(true);                    // Required for RX Link Module
+            vw_setup(2000);                               // Bits per sec
+            vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
+            vw_rx_start();                                // Start the receiver
+    }   
+/*___________________________________________________________ end _____________________________________________________*/
+
+
+
+/*_____ S E T U P()________________________________________ startDisplay() _____________________________________________*/
+    void startDisplay (){
+                
+                display.begin();
+                display.setContrast(50);        //Ajusta o contraste do display
+                display.clearDisplay();         //Apaga o buffer e o display
+                display.setTextSize(1);         //Seta o tamanho do texto
+                display.setTextColor(BLACK);    //Seta a cor do texto
+    }   
+/*___________________________________________________________ end _____________________________________________________*/
+
+
+
+/*====== L O O P ()====================================== printDisplay() =================================*/
+    void printDisplay(){
+                    display.clearDisplay();
+                    display.setTextSize(1);
+                    display.setCursor(8,0);         //Seta a posição do cursor
+                    display.print("RECEPTOR");
+                    
+                    display.setCursor(0,15);
+                    display.print("Cliente: ");
+                    display.print(client);
+                    display.display();
+                    display.setTextSize(2);
+                    display.setCursor(0,25);
+                    display.print(leitura);
+                    display.display();
+     }
+/*=========================================================== end ========================================*/
+
+
+
+/*====== L O O P ()====================================== receiveData() ===============================================*/
+void receiveData(){                    // funcao para receber leitura do gas, enviada pelo transmissor 433MHz           
 
   boolean recebido = false;
   leitura = "";
@@ -113,18 +138,13 @@ void receberLeitura(){                    // funcao para receber leitura do gas,
     if(leitura.length() > 0)                                 // defini loop até vir a leitura e não outro dado em sequencia
       recebido = true;
   }                                                  // end while
-
-         tela.setFont(MediumNumbers);
-         tela.printNumI(leitura.toInt(), CENTER, 30);
-         Serial.print("Leitura...: ");
-         Serial.println(leitura);
 }
-/*----------------------------------------------------------------------------------------*/
+/*=========================================================== end ====================================================*/
 
 
 
-/*----------------------------------------------------------------------------------------*/
-  void gravarBD (){                        // funcao para gravar dados no cartao de memoria
+/*====== L O O P ()====================================== saveDataBase() =================================*/
+  void saveDataBase(){                        // funcao para gravar dados no cartao de memoria
     boolean end = true;
 
     while(end){                                   // enquanto não gravar os dados, continue
@@ -144,7 +164,7 @@ void receberLeitura(){                    // funcao para receber leitura do gas,
       }
     }                                             // end while
   }
-/*----------------------------------------------------------------------------------------*/
+/*=========================================================== end =================================================*/
 
 
 
