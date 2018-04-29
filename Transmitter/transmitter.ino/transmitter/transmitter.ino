@@ -1,4 +1,5 @@
-#include <LCD5110_Basic.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
 #include <VirtualWire.h>
 
 #undef int
@@ -14,11 +15,7 @@
   // pin 11 - LCD chip select (CS/CE)
   // pin 12 - LCD reset (RST)
   
-  LCD5110 tela(8,9,10,12,11);
-  
-  extern uint8_t SmallFont[];
-  extern uint8_t MediumNumbers[];
-  extern uint8_t BigNumbers[];
+Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
 //---------------------------------------FIM-------------------------------------------
 
 
@@ -29,86 +26,114 @@ int volume = 0;
 
 
 void setup() {
-  Serial.begin(9600);
 
-   //---------------------------------------DISPLAY---------------------------------------
-            tela.InitLCD(60);
-
-            tela.setFont(SmallFont); //Definindo a fonte
-            tela.clrScr(); //Apaga o contéudo que estiver na tela
-      
-            tela.setContrast(60);
-            tela.print("RECEPTOR", CENTER, 0);
-            tela.print("Volume:", LEFT, 20);
-            tela.setFont(MediumNumbers);
-
-   //---------------------------------------FIM-------------------------------------------
-
-    attachInterrupt(0,readingVolume,RISING);        //interrupção programada no arduino
-
-   //---------------------------------------RF-433--------------------------------------
-            vw_set_ptt_inverted(true);      // Required for RF Link module
-            vw_setup(2000);                 // Bits per sec
-            vw_set_tx_pin(7);              // pin 7 ARDUINO-UNO
-   //---------------------------------------FIM-------------------------------------------
-
+  startTransmitter();
+  startDisplay();
+  attachInterrupt(0,readingVolume,RISING);        //interrupção programada no arduino
+  
 }
 
 void loop() {
-    
-    tela.setFont(MediumNumbers);
-    tela.printNumI(0, CENTER, 30);
-    delay(2000);
-
-    //Serial.println(volume/2);   //divisão necessaria para relaçao da media
-    
+    printDisplay();
+    delay(1000);
+   
     sendCliente();
     sendLeitura();
+}
+
+
+
+
+
+
+
+
+
+/*_____ S E T U P()________________________________________ startTransmitter() _____________________________________________*/
+    void startTransmitter (){
+      
+                vw_set_ptt_inverted(true);      // Required for RF Link module
+                vw_setup(2000);                 // Bits per sec
+                vw_set_tx_pin(7);              // pin 7 ARDUINO-UNO
+    }   
+/*___________________________________________________________ end _____________________________________________________*/
+
+
+
+/*_____ S E T U P()________________________________________ startTransmitter() _____________________________________________*/
+    void startDisplay (){
+                
+                display.begin();
+                display.setContrast(50);        //Ajusta o contraste do display
+                display.clearDisplay();         //Apaga o buffer e o display
+                display.setTextSize(1);         //Seta o tamanho do texto
+                display.setTextColor(BLACK);    //Seta a cor do texto
+    }   
+/*___________________________________________________________ end _____________________________________________________*/
+
+
+
+
+
+
+
+/*====== L O O P ()====================================== printDisplay() =================================*/
+    void printDisplay(){
+                    display.clearDisplay();
+                    display.setTextSize(1);
+                    display.setCursor(8,0);         //Seta a posição do cursor
+                    display.print("TRANSMISSOR");
+                    
+                    display.setCursor(0,15);
+                    display.print("Volume: ");
+                    display.display();
+                    display.setTextSize(2);
+                    display.setCursor(0,25);
+                    display.print(volume);
+                    display.display();
+     }
+/*=========================================================== end ========================================*/
+
+
+
+/*====== L O O P ()====================================== readingVolume() =================================*/
+    void readingVolume(){
+      volume ++; 
+    }
+/*=========================================================== end ========================================*/
+
+
+
+/*====== L O O P ()===================================== sendCliente() ==================================*/
+    void sendCliente() {
     
-}
-
-/*----------------------------------------------------------------------------------------*/
-void readingVolume(){
-  delay(20000);               //ajuste delay para relação da medida coletada
-  volume ++; 
-}
-/*----------------------------------------------------------------------------------------*/
-
-
-
-
-/*----------------------------------------------------------------------------------------*/
-void sendCliente() {
-
-/********* trecho de codigo para envio de dados transmissor -> recptor */
-                                                                                      //delete delay(1000);
-    char tosend[client.length() + 1];
-    client.toCharArray(tosend, sizeof(tosend));
-    vw_send((uint8_t *)tosend, client.length() + 1);
-    vw_wait_tx();
-/******** end */
-
-    delay(200);
-}
-/*----------------------------------------------------------------------------------------*/
-
-
-
-
-/*----------------------------------------------------------------------------------------*/
-void sendLeitura() {
+    /* trecho de codigo para envio de dados transmissor -> recptor */
+        char tosend[client.length() + 1];
+        client.toCharArray(tosend, sizeof(tosend));
+        vw_send((uint8_t *)tosend, client.length() + 1);
+        vw_wait_tx();
+    /* end */
     
-    String leitura = "0";
-    leitura += String(volume/2);           //converte int em string
-                                                                                      //delete delay(1000);
-    
-/********* trecho de codigo para envio de dados transmissor -> recptor */
-    char tosend[leitura.length() + 1]; 
-    leitura.toCharArray(tosend, sizeof(tosend));
-    vw_send((uint8_t *)tosend, leitura.length() + 1);
-    vw_wait_tx();
-/********* end */
+        delay(200);
+    }
+/*================================================= end ================================================*/
 
-    delay(200);
-}
-/*----------------------------------------------------------------------------------------*/
+
+
+/*======= L O O P ()=================================== sendLeitura() ==================================*/
+    void sendLeitura() {
+        
+        String leitura = "0";
+        leitura += String(volume);           //converte int em string
+                                                                                          
+    /* trecho de codigo para envio de dados transmissor -> recptor */
+        char tosend[leitura.length() + 1]; 
+        leitura.toCharArray(tosend, sizeof(tosend));
+        vw_send((uint8_t *)tosend, leitura.length() + 1);
+        vw_wait_tx();
+    /* end */
+    
+        delay(200);
+    }
+/*================================================ end ================================================*/
+
