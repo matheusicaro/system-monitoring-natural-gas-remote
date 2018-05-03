@@ -1,5 +1,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
+
 #include <VirtualWire.h>    // you must download and install the VirtualWire.h to your hardware/libraries folder
 #include <SD.h>
 #include <SPI.h>
@@ -30,10 +31,8 @@ String client = "";
 
   void setup()
   {
-       Serial.begin(9600);
        startReceiver();
-       startDisplay();
-    
+       startDisplay();    
 
        //---------------------------------------SD-CARD---------------------------------------
             if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       
@@ -59,13 +58,14 @@ String client = "";
          }                                            // end if
 
          
-         receiveData();                            
+         receiveData();
+         printDisplay();                  
          saveDataBase();
-         printDisplay();
          Serial.print("Cliente....: ");
          Serial.println(client);
          Serial.print("Leitura...: ");
          Serial.println(leitura);
+         delay(2000);
       }
       Serial.println("");
     }                                             // end if
@@ -76,7 +76,7 @@ String client = "";
 
 /*_____ S E T U P()________________________________________ startReceiver() _____________________________________________*/
     void startReceiver (){
-
+      
             vw_set_ptt_inverted(true);                    // Required for RX Link Module
             vw_setup(2000);                               // Bits per sec
             vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
@@ -88,14 +88,18 @@ String client = "";
 
 /*_____ S E T U P()________________________________________ startDisplay() _____________________________________________*/
     void startDisplay (){
-                
-                display.begin();
-                display.setContrast(50);        //Ajusta o contraste do display
-                display.clearDisplay();         //Apaga o buffer e o display
-                display.setTextSize(1);         //Seta o tamanho do texto
-                display.setTextColor(BLACK);    //Seta a cor do texto
+ 
+           display.begin();
+           display.setContrast(60);        //Ajusta o contraste do display
+           display.clearDisplay();         //Apaga o buffer e o display
+           display.setTextSize(1);         //Seta o tamanho do texto
+           display.setTextColor(BLACK);    //Seta a cor do texto
     }   
 /*___________________________________________________________ end _____________________________________________________*/
+
+
+
+
 
 
 
@@ -103,16 +107,23 @@ String client = "";
     void printDisplay(){
                     display.clearDisplay();
                     display.setTextSize(1);
-                    display.setCursor(8,0);         //Seta a posição do cursor
-                    display.print("RECEPTOR");
-                    
+                    display.setTextColor(WHITE, BLACK); 
+                    display.setCursor(0,0);         //Seta a posição do cursor
+                    display.print("______________");
+                    display.setCursor(0,1);        
+                    display.print("   RECEPTOR   ");
+
+                    display.setTextColor(BLACK);
                     display.setCursor(0,15);
                     display.print("Cliente: ");
                     display.print(client);
-                    display.display();
+                    
                     display.setTextSize(2);
                     display.setCursor(0,25);
                     display.print(leitura);
+                    display.setTextSize(1);
+                    display.setCursor(42,40);
+                    display.print(" Kg/m^3");
                     display.display();
      }
 /*=========================================================== end ========================================*/
@@ -130,7 +141,7 @@ void receiveData(){                    // funcao para receber leitura do gas, en
     uint8_t buflen = VW_MAX_MESSAGE_LEN;                    // variaveis buf da biblioteca VM 433MHz
     if (vw_get_message(buf, &buflen)){
        if(buf[0] == '0'){                                   // verifica se o primeiro char é 0, codigo da leitura
-           for (int i = 0; i < buflen; i++) {                     // coleta todo dado do buffer recebido
+           for (int i = 1; i < buflen; i++) {                     // coleta todo dado do buffer recebido
              leitura += ((char)buf[i]);                           //
            }                                                      // end for
        }                                                    //end if

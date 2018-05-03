@@ -37,6 +37,6 @@ void loop()
       tela.setFont(MediumNumbers);
       tela.printNumI(volume, CENTER, 30);
       
-      delay(2000);
+      delay(500);
       volume++;
 }

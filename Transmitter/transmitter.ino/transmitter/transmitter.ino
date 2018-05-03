@@ -49,7 +49,7 @@ void loop() {
 
 
 
-/*_____ S E T U P()________________________________________ startTransmitter() _____________________________________________*/
+/*_____ S E T U P()________________________________________ startTransmitter() ________________________________________*/
     void startTransmitter (){
       
                 vw_set_ptt_inverted(true);      // Required for RF Link module
@@ -60,14 +60,11 @@ void loop() {
 
 
 
-/*_____ S E T U P()________________________________________ startTransmitter() _____________________________________________*/
+/*_____ S E T U P()________________________________________ startDisplay() _____________________________________________*/
     void startDisplay (){
                 
                 display.begin();
                 display.setContrast(50);        //Ajusta o contraste do display
-                display.clearDisplay();         //Apaga o buffer e o display
-                display.setTextSize(1);         //Seta o tamanho do texto
-                display.setTextColor(BLACK);    //Seta a cor do texto
     }   
 /*___________________________________________________________ end _____________________________________________________*/
 
@@ -81,15 +78,22 @@ void loop() {
     void printDisplay(){
                     display.clearDisplay();
                     display.setTextSize(1);
-                    display.setCursor(8,0);         //Seta a posição do cursor
-                    display.print("TRANSMISSOR");
-                    
+                    display.setTextColor(WHITE, BLACK); 
+                    display.setCursor(0,0);         //Seta a posição do cursor
+                    display.print("______________");
+                    display.setCursor(0,1);        
+                    display.print(" TRANSMISSOR  ");
+
+                    display.setTextColor(BLACK);
                     display.setCursor(0,15);
                     display.print("Volume: ");
-                    display.display();
                     display.setTextSize(2);
                     display.setCursor(0,25);
+                    
                     display.print(volume);
+                    display.setTextSize(1);
+                    display.setCursor(42,40);
+                    display.print(" Kg/m^3");
                     display.display();
      }
 /*=========================================================== end ========================================*/
