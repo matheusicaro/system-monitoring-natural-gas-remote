@@ -22,23 +22,32 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);
 
 String client = "c-1";
 int volume = 0;
-
-
+int volumeDisplay = 0;
+int CNT = 0;
 
 void setup() {
 
+  Serial.begin(9600); 
+  
   startTransmitter();
   startDisplay();
+  printDisplay();
+
   attachInterrupt(0,readingVolume,RISING);        //interrupção programada no arduino
   
 }
 
 void loop() {
-    printDisplay();
-    delay(1000);
-   
+
+    if (volumeDisplay != volume){
+          printDisplay();
+          volumeDisplay = volume;
+          Serial.println(volumeDisplay);
+    }
+         
     sendCliente();
     sendLeitura();
+    CNT = 0;
 }
 
 
@@ -67,10 +76,29 @@ void loop() {
                 display.setContrast(50);        //Ajusta o contraste do display
     }   
 /*___________________________________________________________ end _____________________________________________________*/
-
-
-
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/*====== L O O P ()====================================== readingVolume() =================================*/
+    void readingVolume(){
+      if (CNT == 0){
+        CNT = 1;
+        volume ++;
+      }
+    }
+/*=========================================================== end ========================================*/
 
 
 
@@ -96,14 +124,6 @@ void loop() {
                     display.print(" Kg/m^3");
                     display.display();
      }
-/*=========================================================== end ========================================*/
-
-
-
-/*====== L O O P ()====================================== readingVolume() =================================*/
-    void readingVolume(){
-      volume ++; 
-    }
 /*=========================================================== end ========================================*/
 
 
