@@ -21,14 +21,12 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);
 
 
 String client = "c-1";
-int volume = 0;
-int volumeDisplay = 0;
-int CNT = 0;
+float volume = 187.58;
+float volumeDisplay = 187.58;
+int INT = 0;
 
 void setup() {
 
-  Serial.begin(9600); 
-  
   startTransmitter();
   startDisplay();
   printDisplay();
@@ -42,13 +40,23 @@ void loop() {
     if (volumeDisplay != volume){
           printDisplay();
           volumeDisplay = volume;
-          Serial.println(volumeDisplay);
     }
-         
+
     sendCliente();
     sendLeitura();
-    CNT = 0;
+    INT = 0;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -93,9 +101,9 @@ void loop() {
 //
 /*====== L O O P ()====================================== readingVolume() =================================*/
     void readingVolume(){
-      if (CNT == 0){
-        CNT = 1;
-        volume ++;
+      if (INT == 0){
+        INT = 1;
+        volume = 0.01 + volume;
       }
     }
 /*=========================================================== end ========================================*/
