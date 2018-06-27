@@ -21,16 +21,22 @@
 Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
 //---------------------------------------FIM-------------------------------------------
 
-
-int CS_PIN = 53;                                // pino do arduino CS = 53, CS é a entrada do cartão de memoria
+int pin = 49;
+int CS_PIN = pin;                                // pino do arduino CS = 53, CS é a entrada do cartão de memoria
 File file;                                      // variavel de armazenamento no cartão de memoria
 
 String leitura = "";
 String client = "";
-
+String auxLeitura = "";
+boolean auxSaveCard = "";
 
   void setup()
   {
+
+       pinMode (pin, OUTPUT);
+       digitalWrite (pin, HIGH);
+
+       Serial.begin(9600);
        startReceiver();
        startDisplay();    
 
@@ -40,7 +46,7 @@ String client = "";
                   return;                                               //
              }                                                          // end
        //---------------------------------------FIM-------------------------------------------
-
+       Serial.println("SETUP: Ok");
   }
 
 
@@ -61,13 +67,11 @@ String client = "";
          receiveData();
          printDisplay();                  
          saveDataBase();
-         Serial.print("Cliente....: ");
-         Serial.println(client);
-         Serial.print("Leitura...: ");
-         Serial.println(leitura);
+         printSerial();                  
+         
          delay(2000);
       }
-      Serial.println("");
+     //Serial.println("");
     }                                             // end if
   }
 
@@ -157,25 +161,41 @@ void receiveData(){                    // funcao para receber leitura do gas, en
 /*====== L O O P ()====================================== saveDataBase() =================================*/
   void saveDataBase(){                        // funcao para gravar dados no cartao de memoria
     boolean end = true;
-
+    
     while(end){                                   // enquanto não gravar os dados, continue
-      
-      client += ".txt";                               // variavel para nome do arquivo txt conforme o cliente,
-      file = SD.open(client, FILE_WRITE);             // abre arquivo com o nome do client
+      String save = client;                               
+      save += ".txt" ;                            // variavel para nome do arquivo txt conforme o cliente,
+      file = SD.open(save, FILE_WRITE);             // abre arquivo com o nome do client
 
       if (file) {                                     // se o arquivo foi aberto, entre e grave os dados
           file.println(leitura);                           // escrevo no txt
           file.close();                                    // feche o arquivo
-          Serial.println("Gravado com sucesso.");
-          end = false;                                
-      } else {                                        
-          Serial.println("ERROR - Ao criar arquivo no banco de dados");
           end = false;
+          auxSaveCard = true;                                
+      } else {                                        
+          end = false;
+          auxSaveCard = false;
           delay(2000);
       }
     }                                             // end while
   }
 /*=========================================================== end =================================================*/
 
-
-
+   void printSerial(){                  
+        
+        if( auxLeitura != leitura){
+             Serial.println("");
+             Serial.println("Dados Recebido");
+             Serial.print("Cliente...: ");
+             Serial.println(client);
+             Serial.print("Leitura...: ");
+             Serial.println(leitura);
+             auxLeitura = leitura;
+            
+            if (auxSaveCard){
+               Serial.println("SD-Card: Success");
+            }else{
+                Serial.println("FAILED: Creat archive in data base");
+            }
+        }
+   }
