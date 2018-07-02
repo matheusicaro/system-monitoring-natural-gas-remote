@@ -1,7 +1,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 
-#include <VirtualWire.h>    // you must download and install the VirtualWire.h to your hardware/libraries folder
+#include <VirtualWire.h>    
 #include <SD.h>
 #include <SPI.h>
 
@@ -11,40 +11,43 @@
 #undef float
 #undef round
 
-//-----------------------------------CONFIG--DISPLAY------------------------------------
-  // pin 8 - Serial clock out (SCLK)
-  // pin 9 - Serial data out (DIN)
-  // pin 10 - Data/Command select (D/C)
-  // pin 11 - LCD chip select (CS/CE)
-  // pin 12 - LCD reset (RST)
-  
-Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
+//-----------------------------------CONFIG--DISPLAY-----------------------------------
+    // pin 8 - Serial clock out (SCLK)
+    // pin 9 - Serial data out (DIN)
+    // pin 10 - Data/Command select (D/C)
+    // pin 11 - LCD chip select (CS/CE)
+    // pin 12 - LCD reset (RST)
+    Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
 //---------------------------------------FIM-------------------------------------------
 
-int pin = 49;
-int CS_PIN = pin;                                // pino do arduino CS = 53, CS é a entrada do cartão de memoria
-File file;                                      // variavel de armazenamento no cartão de memoria
+//-----------------------------------CONFIG--SD-CARD-----------------------------------
+    int pinSDCard = 49;
+    int CS_PIN = pinSDCard;
+    File file;  
+//---------------------------------------FIM-------------------------------------------
 
-String leitura = "";
-String client = "";
-String auxLeitura = "";
-boolean auxSaveCard = "";
+//-----------------------------------VARIABLES OF PROJECT------------------------------
+    String leitura = "";
+    String client = "";
+    String auxLeitura = "";
+    boolean auxSaveCard = "";
+//---------------------------------------FIM-------------------------------------------
+
 
   void setup()
   {
-
-       pinMode (pin, OUTPUT);
-       digitalWrite (pin, HIGH);
+       pinMode (pinSDCard, OUTPUT);
+       digitalWrite (pinSDCard, HIGH);
 
        Serial.begin(9600);
        startReceiver();
        startDisplay();    
 
-       //---------------------------------------SD-CARD---------------------------------------
-            if (!SD.begin(CS_PIN)) {                                    // inicialização da conexão CS do cartão de memoria       
-                  Serial.println("ERROR - Cartao de memoria FALHOU");   //
-                  return;                                               //
-             }                                                          // end
+       //---------------------------------------SD-CARD: Inicialization error-----------------
+            if (!SD.begin(CS_PIN)) {                                           
+                  Serial.println("ERROR - Cartao de memoria FALHOU");   
+                  return;                                               
+             }                                                          
        //---------------------------------------FIM-------------------------------------------
        Serial.println("SETUP: Ok");
   }
@@ -63,16 +66,20 @@ boolean auxSaveCard = "";
            client += ((char)buf[i]);                  //
          }                                            // end if
 
-         
          receiveData();
          printDisplay();                  
          saveDataBase();
-         printSerial();                  
-         
+         printSerialBluetooth();                  
          delay(2000);
       }
-     //Serial.println("");
     }                                             // end if
+
+    if(Serial.read() == 'y'){
+       Serial.print(client+":");
+       Serial.println(leitura);
+      
+       delay(500);
+    }
   }
 
 
@@ -181,7 +188,7 @@ void receiveData(){                    // funcao para receber leitura do gas, en
   }
 /*=========================================================== end =================================================*/
 
-   void printSerial(){                  
+   void printSerialBluetooth(){                  
         
         if( auxLeitura != leitura){
              Serial.println("");
