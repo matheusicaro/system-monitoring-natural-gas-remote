@@ -21,7 +21,7 @@
 //---------------------------------------FIM-------------------------------------------
 
 //-----------------------------------CONFIG--SD-CARD-----------------------------------
-    int pinSDCard = 49;
+    int pinSDCard = 53;
     int CS_PIN = pinSDCard;
     File file;  
 //---------------------------------------FIM-------------------------------------------
@@ -30,8 +30,34 @@
     String leitura = "";
     String client = "";
     String auxLeitura = "";
-    boolean auxSaveCard = "";
 //---------------------------------------FIM-------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   void setup()
@@ -54,6 +80,9 @@
 
 
   void loop() {
+
+    importDataBase();
+    delay (5000);
     
     uint8_t buf[VW_MAX_MESSAGE_LEN];              // variaveis buf da biblioteca VM 433MHz
     uint8_t buflen = VW_MAX_MESSAGE_LEN;          // variaveis buf da biblioteca VM 433MHz
@@ -61,33 +90,48 @@
     client = "";                            
     
     if (vw_get_message(buf, &buflen)){            // se receber sinal do transmissor, entre
-      if(buf[0] == 'c'){                              // analisa qual cliente esta enviando
-         for (int i = 0; i < buflen; i++) {           // coleta todo dado do buffer recebido
+      if(buf[0] == '@'){                              // analisa qual cliente esta enviando
+         for (int i = 1; i < buflen; i++) {           // coleta todo dado do buffer recebido
            client += ((char)buf[i]);                  //
          }                                            // end if
-
          receiveData();
-         printDisplay();                  
          saveDataBase();
-         printSerialBluetooth();                  
-         delay(2000);
-      }
+         printDisplay("");
+       }
     }                                             // end if
 
     if(Serial.read() == 'y'){
-       Serial.print(client+":");
-       Serial.println(leitura);
-      
-       delay(500);
+        importDataBase();
+        delay(500);
     }
+
+        
+    
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 /*_____ S E T U P()________________________________________ startReceiver() _____________________________________________*/
     void startReceiver (){
-      
             vw_set_ptt_inverted(true);                    // Required for RX Link Module
             vw_setup(2000);                               // Bits per sec
             vw_set_rx_pin(2);                             // We will be receiving on pin 4 i.e the RX pin from the module connects to this pin.
@@ -99,12 +143,26 @@
 
 /*_____ S E T U P()________________________________________ startDisplay() _____________________________________________*/
     void startDisplay (){
- 
+      for(int i=0; i < 2; i++){
            display.begin();
            display.setContrast(60);        //Ajusta o contraste do display
            display.clearDisplay();         //Apaga o buffer e o display
            display.setTextSize(1);         //Seta o tamanho do texto
            display.setTextColor(BLACK);    //Seta a cor do texto
+
+           display.clearDisplay();
+           display.setTextSize(1);
+           display.setTextColor(WHITE, BLACK); 
+           display.setCursor(0,0);         //Seta a posição do cursor
+           display.print("______________");
+           display.setCursor(0,1);        
+           display.print("   SERVIDOR   ");
+
+           display.setTextColor(BLACK);
+           display.setCursor(0,15);
+           display.println("Aguardando");
+           display.print("Clientes...");
+      }
     }   
 /*___________________________________________________________ end _____________________________________________________*/
 
@@ -115,15 +173,18 @@
 
 
 /*====== L O O P ()====================================== printDisplay() =================================*/
-    void printDisplay(){
+    void printDisplay(String msgError){                    
+
+                    
+        if(msgError == ""){
                     display.clearDisplay();
                     display.setTextSize(1);
                     display.setTextColor(WHITE, BLACK); 
                     display.setCursor(0,0);         //Seta a posição do cursor
                     display.print("______________");
                     display.setCursor(0,1);        
-                    display.print("   RECEPTOR   ");
-
+                    display.print("   SERVIDOR   ");
+          
                     display.setTextColor(BLACK);
                     display.setCursor(0,15);
                     display.print("Cliente: ");
@@ -136,6 +197,10 @@
                     display.setCursor(42,40);
                     display.print(" Kg/m^3");
                     display.display();
+        }else{
+                    Serial.println(msgError);
+                    delay(2000);
+        }                 
      }
 /*=========================================================== end ========================================*/
 
@@ -145,13 +210,14 @@
 void receiveData(){                    // funcao para receber leitura do gas, enviada pelo transmissor 433MHz           
 
   boolean recebido = false;
+  int tempDelay = 0;
   leitura = "";
   
-  while(!recebido){                                  // loop para aguardar a leitura a ser enviada
+  while(!recebido && tempDelay < 2147483646){             // loop para aguardar a leitura a ser enviada
     uint8_t buf[VW_MAX_MESSAGE_LEN];                        // variaveis buf da biblioteca VM 433MHz
     uint8_t buflen = VW_MAX_MESSAGE_LEN;                    // variaveis buf da biblioteca VM 433MHz
     if (vw_get_message(buf, &buflen)){
-       if(buf[0] == '0'){                                   // verifica se o primeiro char é 0, codigo da leitura
+       if(buf[0] == '#'){                                   // verifica se o primeiro char é 0, codigo da leitura
            for (int i = 1; i < buflen; i++) {                     // coleta todo dado do buffer recebido
              leitura += ((char)buf[i]);                           //
            }                                                      // end for
@@ -159,7 +225,14 @@ void receiveData(){                    // funcao para receber leitura do gas, en
     }
     if(leitura.length() > 0)                                 // defini loop até vir a leitura e não outro dado em sequencia
       recebido = true;
+    else
+      tempDelay++;
   }                                                  // end while
+  
+  if(!recebido){
+      String msgError = "RF433-Failed";
+      printDisplay(msgError);
+  }
 }
 /*=========================================================== end ====================================================*/
 
@@ -167,42 +240,102 @@ void receiveData(){                    // funcao para receber leitura do gas, en
 
 /*====== L O O P ()====================================== saveDataBase() =================================*/
   void saveDataBase(){                        // funcao para gravar dados no cartao de memoria
-    boolean end = true;
+    boolean save = false;
+    int tempDelay = 0;
+    String date = "Z";
+    date += client;
     
-    while(end){                                   // enquanto não gravar os dados, continue
-      String save = client;                               
-      save += ".txt" ;                            // variavel para nome do arquivo txt conforme o cliente,
-      file = SD.open(save, FILE_WRITE);             // abre arquivo com o nome do client
-
-      if (file) {                                     // se o arquivo foi aberto, entre e grave os dados
-          file.println(leitura);                           // escrevo no txt
-          file.close();                                    // feche o arquivo
-          end = false;
-          auxSaveCard = true;                                
-      } else {                                        
-          end = false;
-          auxSaveCard = false;
-          delay(2000);
-      }
+    while(!save && tempDelay < 20){                                   // enquanto não gravar os dados, continue
+        file = SD.open(date, FILE_WRITE);             // abre arquivo com o nome do client
+        if (file) {                                     // se o arquivo foi aberto, entre e grave os dados
+            file.println(leitura);                           // escrevo no txt
+            file.close();                                    // feche o arquivo
+            save = true;
+        } else {                                        
+            save = false;
+        }
+        tempDelay++;
     }                                             // end while
+
+    if(!save){
+         String msgError = "SDCard-Failed";
+         printDisplay(msgError);
+    }
+    
+    client = "";
   }
 /*=========================================================== end =================================================*/
 
-   void printSerialBluetooth(){                  
-        
-        if( auxLeitura != leitura){
-             Serial.println("");
-             Serial.println("Dados Recebido");
-             Serial.print("Cliente...: ");
-             Serial.println(client);
-             Serial.print("Leitura...: ");
-             Serial.println(leitura);
-             auxLeitura = leitura;
-            
-            if (auxSaveCard){
-               Serial.println("SD-Card: Success");
-            }else{
-                Serial.println("FAILED: Creat archive in data base");
+
+
+/*====== L O O P ()====================================== importDataBase() ========================================*/
+   void importDataBase(){                  
+    File root = SD.open("/");
+    //importData(root, 0);
+    root.rewindDirectory();
+    importData(root, 0);
+    root.close();
+    
+   }
+
+   void importData (File dir, int numTabs){
+        while(true){
+            File entry = dir.openNextFile();
+            if (! entry){
+                if (numTabs == 0)
+                Serial.println();
+                return;
             }
+            
+            String nameFileClient = entry.name();
+            char idClient [nameFileClient.length()];
+            nameFileClient.toCharArray(idClient, nameFileClient.length());
+            
+            if(idClient[0] == '_' || idClient[0] == 'J'){
+                sendClientDate(nameFileClient);
+            }
+            if (entry.isDirectory()){
+                importData(entry, numTabs+1);
+            }
+            entry.close();
         }
    }
+
+   void sendClientDate(String nameFileClient){
+        String clientLeitura = "";
+        File clientFile = SD.open(nameFileClient);
+        int linha = 0;
+        while(clientFile.available()){
+            if(clientFile.read() == '\n'){
+              linha ++;
+            }
+        }
+        clientFile.close();
+        clientFile = SD.open(nameFileClient);
+        
+        //Serial.println("-" + nameFileClient);
+       
+        if (linha == 0){
+            while(clientFile.available()){
+               clientLeitura += ((char)clientFile.read());
+           }
+        }else{
+            int linha2 = 0;
+            boolean stopReading = false;
+            while(clientFile.available()){
+               if(stopReading == false && clientFile.read() == '\n'){
+                  linha2 ++;
+               }
+               if((linha2 + 1) == linha){
+                  stopReading = true;
+                  clientLeitura += ((char)clientFile.read());
+               }
+            }
+        }
+        Serial.println(nameFileClient + ": " + clientLeitura);
+        clientFile.close();
+   }
+/*=========================================================== end =================================================*/
+
+
+  void testSD();
