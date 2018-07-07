@@ -81,8 +81,6 @@
 
   void loop() {
 
-    importDataBase();
-    delay (5000);
     
     uint8_t buf[VW_MAX_MESSAGE_LEN];              // variaveis buf da biblioteca VM 433MHz
     uint8_t buflen = VW_MAX_MESSAGE_LEN;          // variaveis buf da biblioteca VM 433MHz
@@ -104,8 +102,6 @@
         importDataBase();
         delay(500);
     }
-
-        
     
   }
 
@@ -242,7 +238,7 @@ void receiveData(){                    // funcao para receber leitura do gas, en
   void saveDataBase(){                        // funcao para gravar dados no cartao de memoria
     boolean save = false;
     int tempDelay = 0;
-    String date = "Z";
+    String date = "_";
     date += client;
     
     while(!save && tempDelay < 20){                                   // enquanto não gravar os dados, continue
@@ -313,8 +309,6 @@ void receiveData(){                    // funcao para receber leitura do gas, en
         clientFile.close();
         clientFile = SD.open(nameFileClient);
         
-        //Serial.println("-" + nameFileClient);
-       
         if (linha == 0){
             while(clientFile.available()){
                clientLeitura += ((char)clientFile.read());
@@ -336,6 +330,3 @@ void receiveData(){                    // funcao para receber leitura do gas, en
         clientFile.close();
    }
 /*=========================================================== end =================================================*/
-
-
-  void testSD();
