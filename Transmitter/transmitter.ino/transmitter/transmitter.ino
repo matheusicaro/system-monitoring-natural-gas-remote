@@ -19,7 +19,7 @@
   Adafruit_PCD8544 display = Adafruit_PCD8544(8, 9, 10, 11, 12);  
 //---------------------------------------FIM-------------------------------------------
 
-String client = "@math";                                                                // global variable of customer identification
+String client = "@C-1";                                                                // global variable of customer identification
 float volume = 188.00;                                                                  // global reading variable, adjusted with current meter
 float volumeDisplay = 188.00;                                                           // global display variable, required to print only when reading varies
 boolean INT = false;                                                                    // interrupt control variable
@@ -108,7 +108,7 @@ void loop() {
                     display.setCursor(0,0);                                             // Arrow cursor position
                     display.print("______________");                                    // Print data
                     display.setCursor(0,1);                                             // Insert cursor position
-                    display.print(" TRANSMISSOR  ");                                    // Print data
+                    display.print("   CLIENTE    ");                                    // Print data
 
                     display.setTextColor(BLACK);                                        // Insert black color in display text
                     display.setCursor(0,15);                                            // Insert cursor position

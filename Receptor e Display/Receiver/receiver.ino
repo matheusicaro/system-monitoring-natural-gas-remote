@@ -30,6 +30,8 @@
     String leitura = "";
     String client = "";
     String auxLeitura = "";
+    String Laux = "";
+    String Caux = "";
 //---------------------------------------FIM-------------------------------------------
 
 
@@ -94,13 +96,19 @@
            client += ((char)buf[i]);                                                          // stores the module buffer data 433MHz
          }                                                                                    // end if
          receiveData();                                                                       // function to receive customer readings
+         Caux = client;
+         Laux = leitura;
          saveDataBase();                                                                      // function to know the data received in SD-CARD, data in JSON: "client: read";
          printDisplay("");                                                                    // function to print the received data on the display
        }                                                                                      // 
+        client = "";                                                                               // empty global variable;
     }                                                                                         // 
+    
 
     if(Serial.read() == 'y'){                                                                 // if it receives the character "y" by serial (pin_0 and pin_1 of arduino)
-        importDataBase();                                                                     // function required to import SD-CARD data
+                Serial.println(Caux + ": " + Laux);                                 // print the read data on the serial
+
+        //importDataBase();                                                                     // function required to import SD-CARD data
         delay(500);
     }
   }
@@ -254,7 +262,6 @@ void receiveData(){                                                             
          printDisplay(msgError);                                                               // print error message
     }
     
-    client = "";                                                                               // empty global variable;
   }/*=========================================================== end =======================*/
 
 
@@ -281,7 +288,7 @@ void receiveData(){                                                             
             char idClient [nameFileClient.length()];                                           // initialize a char array of file name size
             nameFileClient.toCharArray(idClient, nameFileClient.length());                     // char array gets client name by characters
             
-            if(idClient[0] == '_' || idClient[0] == 'J'){                                      // if file ID contains '_' and 'J', enter and read
+            if(idClient[0] == '_'){                                      // if file ID contains '_' and 'J', enter and read
                 sendClientDate(nameFileClient);                                                // send data from archives found by ID
             }
             if (entry.isDirectory()){                                                          // if next file is contained in sequence, enter
@@ -310,16 +317,18 @@ void receiveData(){                                                             
             while(clientFile.available()){                                                     // while the file is available, continue
                clientLeitura += ((char)clientFile.read());                                     // receives the data read in the file
            }
-        }else{                                                                                 // if there are several lines inside the file, take the last line
+        }else{    
+             int c = 0; // if there are several lines inside the file, take the last line
             int linha2 = 0;                                                                    // variable for control of last line
             boolean stopReading = false;                                                       // variable for loop control
             while(clientFile.available()){                                                     // while file is available, enter
                if(stopReading == false && clientFile.read() == '\n'){                          // pass to the next line, if it is not the last one or cose exite next line
                   linha2 ++;                                                                   // counter to the next row
                }
-               if((linha2 + 1) == linha){                                                      // if it is the last line, enter
+               if(((linha2 + 1) == linha) && c < 6){                                                      // if it is the last line, enter
                   stopReading = true;                                                          // stop while
                   clientLeitura += ((char)clientFile.read());                                  // receives the data read in the file
+                  c++;
                }
             }
         }
