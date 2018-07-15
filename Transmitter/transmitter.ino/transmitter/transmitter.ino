@@ -56,7 +56,6 @@ void loop() {
     
     delay(1000);
     
-    sendCliente();                                                                      // function to send client ID
     sendLeitura();                                                                      // function to send completed gas reading
     
     INT = false;                                                                        // insert interrupt to false;
@@ -96,7 +95,8 @@ void loop() {
         INT = true;                                                                     // interrupt control arrow, true
         volume = 0.01 + volume;                                                         // volume is updated as interrupt
       }
-    }/*=========================================================== end ==============*/
+    }
+/*=========================================================== end ======================================================*/
 
 
 
@@ -140,8 +140,8 @@ void loop() {
 /*======= L O O P ()=================================== sendLeitura() ================*/ // function to send completed gas reading
     void sendLeitura() {
 
-        String leitura = "#";                                                           // identification to identify read at receiver
-        leitura += String(volume);                                                      // converte int em string
+        String leitura = client;                                                        // identification to identify read at receiver
+        leitura += "#" + String(volume);                                                      // converte int em string
                                                                                           
         char tosend[leitura.length() + 1];                                              // array to receive data transmission
         leitura.toCharArray(tosend, sizeof(tosend));                                    // character array receives value for sending

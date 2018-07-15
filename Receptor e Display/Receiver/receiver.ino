@@ -30,8 +30,6 @@
     String leitura = "";
     String client = "";
     String auxLeitura = "";
-    String Laux = "";
-    String Caux = "";
 //---------------------------------------FIM-------------------------------------------
 
 
