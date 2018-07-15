@@ -122,19 +122,7 @@ void loop() {
                     display.print(" Kg/m^3");                                           // Print data
                     display.display();                                                  // Print data
      }/*=========================================================== end =============*/
-
-
-
-/*====== L O O P ()===================================== sendCliente() ==============*/ // function to send client ID
-    void sendCliente() {
-        char tosend[client.length() + 1];                                               // array to receive data transmission
-        client.toCharArray(tosend, sizeof(tosend));                                     // character array receives value for sending
-        vw_send((uint8_t *)tosend, client.length() + 1);                                // sending characters
-        vw_wait_tx();                                                                   // function to wait for transmission
-   
-        delay(200);
-    }/*================================================= end =========================*/
-
+     
 
 
 /*======= L O O P ()=================================== sendLeitura() ================*/ // function to send completed gas reading
