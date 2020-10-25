@@ -1,0 +1,10 @@
+{
+    "backend": {
+        "name": "C++",
+        "color": "#575352",
+        "tags": [
+            "Arduino",
+            "Microcontrollers"
+        ]
+    }
+}
