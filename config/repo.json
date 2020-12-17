@@ -1,12 +1,30 @@
 {
-   "backend":[
+  "profile": {
+    "pt": {
+      "kind": "Open Source",
+      "name": "Sistema Para Monitorar Gás Natural Remotamente",
+      "intro": "Projeto de conclusão de curso na universidade onde pude construir um sistema de automação industrial para monitorar o consumo de Gás Natural remotamente."
+    },
+    "en": {
+      "kind": "Open Source",
+      "name": "System For Monitoring Gás Natural Remotely",
+      "intro": "Final graduation project at the university where I was able to build an industrial automation system to monitor the consumption of Natural Gas remotely."
+    },
+    "es": {
+      "kind": "Open Source",
+      "name": "Sistema Para Monitorear El Gas Natural De Forma Remota",
+      "intro": "Proyecto de fin de carrera en la universidad donde pude construir un sistema de automatización industrial para monitorear el consumo de Gas Natural de forma remota."
+    }
+  },
+  "stack": {
+    "backend": [
       {
-         "name":"C++",
-         "color":"#575352",
-         "tags":[
-            "Arduino",
-            "Microcontrollers"
-         ]
+        "name": "C++",
+        "tags": [
+          "Arduino",
+          "Microcontrollers"
+        ]
       }
-   ]
+    ]
+  }
 }
