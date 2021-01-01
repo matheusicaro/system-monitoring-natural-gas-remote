@@ -5,6 +5,11 @@
       "name": "Sistema Para Monitorar Gás Natural Remotamente",
       "intro": "Projeto de conclusão de curso na universidade onde pude construir um sistema de automação industrial para monitorar o consumo de Gás Natural remotamente."
     },
+    "fr": {
+      "kind": "Open Source",
+      "name": "Système pour surveiller le gaz naturel à distance",
+      "intro": "Projet de fin d'études à l'université où j'ai pu construire un système d'automatisation industrielle pour suivre à distance la consommation de gaz naturel."
+    },
     "en": {
       "kind": "Open Source",
       "name": "System For Monitoring Gas Natural Remotely",
@@ -20,10 +25,7 @@
     "backend": [
       {
         "name": "C++",
-        "tags": [
-          "Arduino",
-          "Microcontrollers"
-        ]
+        "tags": ["Arduino", "Microcontrollers"]
       }
     ]
   }
