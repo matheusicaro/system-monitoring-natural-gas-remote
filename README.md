@@ -1,4 +1,5 @@
 # Industrial Automation Project - Natural Gas Monitoring
+[![license](https://img.shields.io/github/license/DAVFoundation/captain-n3m0.svg?style=flat-square)](https://github.com/matheusicaro/system-monitoring-natural-gas-remote/blob/master/LICENSE)
 
 This is an industrial automation project that monitors the consumption of natural gas. Baiscamente this project consists of an automation to collect the reading in the gas meters. It consists of two devices, called "client" and "server", were developed. For the "client", it is connected to any gas measuring device (hydrometer) that has digital pulse outputs, such as those used by the reed-swtich sensor in 5V.
 
