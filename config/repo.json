@@ -21,6 +21,7 @@
       "intro": "Proyecto de fin de carrera en la universidad donde pude construir un sistema de automatización industrial para monitorear el consumo de Gas Natural de forma remota."
     }
   },
+  "tags": ["C++", "Arduino", "Microcontrollers"],
   "stack": {
     "backend": [
       {
